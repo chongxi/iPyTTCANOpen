@@ -183,7 +183,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.can.canid = int(self.lineEdit_can.text())
             print('can id set to {}'.format(self.can.canid))
         except:
-            print('cannot change CAN ID, check motor connection status')
+            print('fail to change CAN ID at {}'.format(self.serialPort))
             self.can.canid = 1
     
     def update_position(self):
