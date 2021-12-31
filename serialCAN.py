@@ -86,7 +86,6 @@ class serialCAN():
         kp = BitArray(uint=float_to_uint(kp, PARAMS['KP_MIN'], PARAMS['KP_MAX'], 12), length=12)
         kd = BitArray(uint=float_to_uint(kd, PARAMS['KD_MIN'], PARAMS['KD_MAX'], 12), length=12)
 
-        # ! Need to add a function to replace self.cmd.hex[:10] with the correct CAN ID
         self.cmd.hex = self.prefix.hex + pos.hex + vel.hex + kp.hex + kd.hex + tor.hex + self.cmd.hex[-2:]
         
         # for i in range(5):
