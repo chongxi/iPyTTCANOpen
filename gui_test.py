@@ -173,6 +173,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         self.enable_update()
                         self.can.set(position=0, velocity=0, torque=0, kp=50, kd=1)
                         self.statusBar().showMessage('connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
+                        self.timer.start()
                     else:
                         self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
                         self.serialConnectBtn.toggle()
@@ -215,7 +216,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout.addWidget(self.graphWidget_velocity)
         self.verticalLayout.addWidget(self.graphWidget_torque)
 
-        self.ydata = [random.randint(0, 1) for i in range(n_data)]
+        self.posdata = [0 for i in range(n_data)]
+        self.veldata = [0 for i in range(n_data)]
+        self.tordata = [0 for i in range(n_data)]
 
         self.curve_pos = self.graphWidget_position.plot()
         self.curve_vel = self.graphWidget_velocity.plot()
@@ -223,17 +226,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
+        self.timer.setInterval(5)
         self.timer.timeout.connect(self.update_plot)
-        self.timer.start()
 
     def update_plot(self):
+        self.can.refresh()
         # Drop off the first y element, append a new one.
-        self.ydata = self.ydata[1:] + [random.randint(0, 100)]
-        # self.graphWidget_position.plot(self.xdata, self.ydata)
-        self.curve_pos.setData(self.ydata)
-        self.curve_vel.setData(self.ydata)
-        self.curve_tor.setData(self.ydata)
+        self.posdata = self.posdata[1:] + [self.can._read_position_rad]
+        self.veldata = self.veldata[1:] + [self.can._read_speed_rad]
+        self.tordata = self.tordata[1:] + [self.can._read_torque]
+        self.curve_pos.setData(self.posdata)
+        self.curve_vel.setData(self.veldata)
+        self.curve_tor.setData(self.tordata)
 
 
 if __name__ == '__main__':

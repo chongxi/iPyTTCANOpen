@@ -96,6 +96,12 @@ class serialCAN():
         self._read_speed_rad = uint_to_float(self._last_read[4*24:4*27].uint, PARAMS['V_MIN'], PARAMS['V_MAX'], 12)
         self._read_torque = uint_to_float(self._last_read[4*27:4*30].uint, PARAMS['T_MIN'], PARAMS['T_MAX'], 12)
         return self._read_position_rad, self._read_speed_rad, self._read_torque
+    
+    def refresh(self):
+        '''
+        set the last command to read out the status
+        '''
+        self.set(self._position, self._velocity, self._torque, self._kp, self._kd)
 
     @property
     def position(self):
