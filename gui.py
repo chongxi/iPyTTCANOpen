@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\Study\Proprioceptive Actuator\iPyTTCANOpen\gui.ui'
+# Form implementation generated from reading ui file 'd:\Study\Proprioceptive Actuator\iPyTTCANOpen\gui2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -9,69 +9,120 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pyqtgraph as pg
+import random
 
-
-class Ui_MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(Ui_MainWindow, self).__init__(*args, **kwargs)
-
-    def setupUi(self):
-        self.resize(1116, 532)
-        self.centralwidget = QtWidgets.QWidget(self)
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.setCentralWidget(self.centralwidget)
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayout_2.addLayout(self.verticalLayout, 1, 0, 1, 1)
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox.setObjectName("groupBox")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.groupBox)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.formLayout = QtWidgets.QFormLayout()
-        self.formLayout.setObjectName("formLayout")
-        self.label_serial = QtWidgets.QLabel(self.centralwidget)
-        self.label_serial.setObjectName("label_serial")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_serial)
-        self.serialSelector = QtWidgets.QComboBox(self.centralwidget)
+        self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
+        self.lineEdit.setObjectName("lineEdit")
+        self.gridLayout.addWidget(self.lineEdit, 2, 1, 1, 1)
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.gridLayout.addWidget(self.lineEdit_2, 2, 3, 1, 1)
+        # spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.gridLayout.addItem(spacerItem, 0, 1, 1, 1)
+        self.pushButton = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton.setObjectName("pushButton")
+        self.gridLayout.addWidget(self.pushButton, 0, 3, 1, 1)
+        # spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.gridLayout.addItem(spacerItem1, 0, 2, 1, 1)
+        self.serialSelector = QtWidgets.QComboBox(self.groupBox)
+        self.serialSelector.setModelColumn(0)
         self.serialSelector.setObjectName("serialSelector")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.serialSelector)
-        self.label_position = QtWidgets.QLabel(self.centralwidget)
-        self.label_position.setObjectName("label_position")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_position)
-        self.positionSlider = QtWidgets.QSlider(self.centralwidget)
+        self.gridLayout.addWidget(self.serialSelector, 0, 1, 1, 2)
+        self.positionSlider = QtWidgets.QSlider(self.groupBox)
         self.positionSlider.setMaximum(6283)
         self.positionSlider.setPageStep(10)
         self.positionSlider.setOrientation(QtCore.Qt.Horizontal)
         self.positionSlider.setObjectName("positionSlider")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.positionSlider)
-        self.label_kpkd = QtWidgets.QLabel(self.centralwidget)
+        self.gridLayout.addWidget(self.positionSlider, 1, 1, 1, 5)
+        # spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.gridLayout.addItem(spacerItem2, 0, 3, 1, 1)
+        self.label_8 = QtWidgets.QLabel(self.groupBox)
+        self.label_8.setObjectName("label_8")
+        self.gridLayout.addWidget(self.label_8, 2, 4, 1, 1)
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
+        self.lineEdit_3.setObjectName("lineEdit_3")
+        self.gridLayout.addWidget(self.lineEdit_3, 2, 5, 1, 1)
+        self.label_position = QtWidgets.QLabel(self.groupBox)
+        self.label_position.setObjectName("label_position")
+        self.gridLayout.addWidget(self.label_position, 1, 0, 1, 1)
+        self.label_7 = QtWidgets.QLabel(self.groupBox)
+        self.label_7.setObjectName("label_7")
+        self.gridLayout.addWidget(self.label_7, 2, 2, 1, 1)
+        # spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.gridLayout.addItem(spacerItem3, 0, 0, 1, 1)
+        self.label_kpkd = QtWidgets.QLabel(self.groupBox)
         self.label_kpkd.setObjectName("label_kpkd")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_kpkd)
-        self.kpkd_lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.kpkd_lineEdit.setObjectName("kpkd_lineEdit")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.kpkd_lineEdit)
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.formLayout.setLayout(3, QtWidgets.QFormLayout.SpanningRole, self.verticalLayout_3)
-        self.gridLayout.addLayout(self.formLayout, 0, 0, 1, 1)
-        self.menubar = QtWidgets.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1116, 24))
+        self.gridLayout.addWidget(self.label_kpkd, 2, 0, 1, 1)
+        # spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        # self.gridLayout.addItem(spacerItem4, 0, 4, 1, 1)
+        self.label_serial = QtWidgets.QLabel(self.groupBox)
+        self.label_serial.setObjectName("label_serial")
+        self.gridLayout.addWidget(self.label_serial, 0, 0, 1, 1)
+        self.gridLayout_3.addLayout(self.gridLayout, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
+        # spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        # self.gridLayout_2.addItem(spacerItem5, 1, 1, 1, 1)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
         self.menubar.setObjectName("menubar")
-        self.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(self)
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
-        self.setStatusBar(self.statusbar)
+        MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label_serial.setText(_translate("MainWindow", "Serial port"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.groupBox.setTitle(_translate("MainWindow", "Configuration:"))
+        self.pushButton.setText(_translate("MainWindow", "Connect"))
+        self.label_8.setText(_translate("MainWindow", "torque"))
         self.label_position.setText(_translate("MainWindow", "Position"))
+        self.label_7.setText(_translate("MainWindow", "velosity"))
         self.label_kpkd.setText(_translate("MainWindow", "Kp,Kd:"))
+        self.label_serial.setText(_translate("MainWindow", "Serial port"))
 
+    def setup_plot(self, n_data=400):
+        self.graphWidget_position = pg.PlotWidget()
+        self.graphWidget_velocity = pg.PlotWidget()
+        self.graphWidget_torque = pg.PlotWidget()
+        self.verticalLayout.addWidget(self.graphWidget_position)
+        self.verticalLayout.addWidget(self.graphWidget_velocity)
+        self.verticalLayout.addWidget(self.graphWidget_torque)
+
+        self.ydata = [random.randint(0, 1) for i in range(n_data)]
+
+        self.curve_pos = self.graphWidget_position.plot()
+        self.curve_vel = self.graphWidget_velocity.plot()
+        self.curve_tor = self.graphWidget_torque.plot()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi()
-    ui.show()
+    ui.setupUi(MainWindow)
+    ui.setup_plot()
+    MainWindow.show()
     sys.exit(app.exec_())
