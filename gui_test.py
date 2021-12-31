@@ -220,7 +220,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_position_edit(self):
         self.target_position = float(self.positionEdit.text())
         self.can.position = self.target_position
-        self.positionSlider.setValue(self.target_position*1000)
+        self.positionSlider.setValue(int(self.target_position*1000))
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
 
