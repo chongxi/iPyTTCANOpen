@@ -242,6 +242,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ax2 = self.graphWidget_torque.getAxis('bottom')
         ax2.setTicks([[(i, str(i*self.dt*1e-3))
                        for i in range(0, n_data, 100)]])
+        self.graphWidget_velocity.setXLink(self.graphWidget_position)
+        self.graphWidget_torque.setXLink(self.graphWidget_position)
+
+        self.graphWidget_position.setYRange(0, 6.29, padding=0)
+        self.graphWidget_velocity.setYRange(-50, 50, padding=0)
+        self.graphWidget_torque.setYRange(-20, 20, padding=0)
+        
+        self.graphWidget_position.setLabel('left', 'position', units='rad')
+        self.graphWidget_velocity.setLabel('left', 'velocity', units='rad/s')
+        self.graphWidget_torque.setLabel('left', 'torque', units='Nm')
+        self.graphWidget_torque.setLabel('bottom', 'time', units='s')
+
 
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()
