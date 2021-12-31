@@ -211,17 +211,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.can.canid = 1
     
     def update_position_slider(self):
-        # print('updating position')
-        # print(self.positionSlider.value())
-        # resolution is np.pi*2/1000 (0.001 rad)
         self.target_position = self.positionSlider.value()/1000
         self.can.position = self.target_position
+        self.positionEdit.setText(str(self.target_position))
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
 
     def update_position_edit(self):
         self.target_position = float(self.positionEdit.text())
         self.can.position = self.target_position
+        self.positionSlider.setValue(self.target_position*1000)
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
 
