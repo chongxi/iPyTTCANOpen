@@ -72,7 +72,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.positionSlider.setPageStep(10)
         self.positionSlider.setOrientation(QtCore.Qt.Horizontal)
         self.positionSlider.setObjectName("positionSlider")
-        self.gridLayout.addWidget(self.positionSlider, 1, 1, 1, 5)
+        self.gridLayout.addWidget(self.positionSlider, 1, 1, 1, 4)
+
+        self.positionEdit = QtWidgets.QLineEdit(self.groupBox)
+        self.positionEdit.setObjectName("positionEdit")
+        self.gridLayout.addWidget(self.positionEdit, 1, 5, 1, 1)
+
         self.label_8 = QtWidgets.QLabel(self.groupBox)
         self.label_8.setObjectName("label_8")
         self.label_8.setStyleSheet(
@@ -133,10 +138,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.lineEdit.setText('50,1')
         self.lineEdit_2.setText('0')
         self.lineEdit_3.setText('0')
+        self.positionEdit.setText('0')
 
     def setup_callback(self):
         self.serialConnectBtn.clicked.connect(self.connect_to_motor)
-        self.positionSlider.valueChanged.connect(self.update_position)
+        self.positionSlider.valueChanged.connect(self.update_position_slider)
+        self.positionEdit.returnPressed.connect(self.update_position_edit)
         self.lineEdit_can.returnPressed.connect(self.update_can_id)
 
     def disable_update(self):
@@ -203,11 +210,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             print('fail to change CAN ID at {}'.format(self.serialPort))
             self.can.canid = 1
     
-    def update_position(self):
+    def update_position_slider(self):
         # print('updating position')
         # print(self.positionSlider.value())
         # resolution is np.pi*2/1000 (0.001 rad)
         self.target_position = self.positionSlider.value()/1000
+        self.can.position = self.target_position
+        self.statusBar().showMessage(
+            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
+
+    def update_position_edit(self):
+        self.target_position = float(self.positionEdit.text())
         self.can.position = self.target_position
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
