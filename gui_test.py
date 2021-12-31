@@ -159,6 +159,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     else:
                         self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
                         self.serialConnectBtn.toggle()
+                        self.can.close()
             except:
                 print('could not connect to motor')
                 self.statusBar().showMessage('cannot connect to {}'.format(self.serialPort))
