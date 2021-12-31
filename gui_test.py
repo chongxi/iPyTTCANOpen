@@ -68,7 +68,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(self.lineEdit_can, 0, 5, 1, 1)
 
         self.positionSlider = QtWidgets.QSlider(self.groupBox)
-        self.positionSlider.setMaximum(6283)
+        self.positionSlider.setMaximum(6290)
         self.positionSlider.setPageStep(10)
         self.positionSlider.setOrientation(QtCore.Qt.Horizontal)
         self.positionSlider.setObjectName("positionSlider")
@@ -204,6 +204,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         print('updating position')
         print(self.positionSlider.value())
         self.can.position = self.positionSlider.value()/1000 # resolution is np.pi*2/1000 (0.001 rad)
+        self.statusBar().showMessage(
+            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
 
     def setup_plot(self, n_data=400):
         self.graphWidget_position = pg.PlotWidget()
