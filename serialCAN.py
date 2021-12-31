@@ -36,31 +36,41 @@ class serialCAN():
     def send(self, message):
         self.ser.write(message)
 
+    @property
+    def prefix(self):
+        '''
+        prefix attached to all commands (TTCANOpen protocol)
+        '''
+        _prefix = serial.to_bytes([0xAA, 0x55, 0x00, self.canid, 0x08])  # - Header of TTCANOpen protocol for standard CAN command
+        self._prefix = BitArray(_prefix)
+        return self._prefix
+
     def enterMotorMode(self):
-        cmd = serial.to_bytes([0xAA, 0x55, 0x00, self.canid, 0x08,             # - Header of TTCANOpen protocol for standard CAN command
-                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC, # - MIT Chetah CAN command (8 Bytes)
+        cmd = serial.to_bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC, # - MIT Chetah CAN command (8 Bytes)
                                0xDD])                                          # - TTCANOpen end flag (0xDD)
         self.cmd = BitArray(cmd)
+        self.cmd.hex = self.prefix.hex + self.cmd.hex # order is important here; don;t use +=
         self.send(self.cmd.bytes)
         ack = self.ser.read(16)
         if len(ack)>0:
             return True
 
     def exitMotorMode(self):
-        cmd = serial.to_bytes([0xAA, 0x55, 0x00, self.canid, 0x08,
-                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD, 
+        cmd = serial.to_bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD, 
                                0xDD])
         self.cmd = BitArray(cmd)
+        # order is important here; don;t use +=
+        self.cmd.hex = self.prefix.hex + self.cmd.hex
         self.send(self.cmd.bytes)
         ack = self.ser.read(16)
         if len(ack) > 0:
             return True
 
     def setZeroPosition(self):
-        cmd = serial.to_bytes([0xAA, 0x55, 0x00, self.canid, 0x08,
-                               0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 
+        cmd = serial.to_bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 
                                0xDD])
         self.cmd = BitArray(cmd)
+        self.cmd.hex = self.prefix.hex + self.cmd.hex
         self.send(self.cmd.bytes)
 
     def set(self, position, velocity=0, torque=0, kp=10, kd=0.5):
@@ -77,7 +87,7 @@ class serialCAN():
         kd = BitArray(uint=float_to_uint(kd, PARAMS['KD_MIN'], PARAMS['KD_MAX'], 12), length=12)
 
         # ! Need to add a function to replace self.cmd.hex[:10] with the correct CAN ID
-        self.cmd.hex = self.cmd.hex[:10] + pos.hex + vel.hex + kp.hex + kd.hex + tor.hex + self.cmd.hex[-2:]
+        self.cmd.hex = self.prefix.hex + pos.hex + vel.hex + kp.hex + kd.hex + tor.hex + self.cmd.hex[-2:]
         
         # for i in range(5):
         self.send(self.cmd.bytes)
