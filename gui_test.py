@@ -185,6 +185,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         elif checked==0:
             if self.can.exitMotorMode():
+                self.timer.stop()
                 self.disable_update()
             self.can.exitMotorMode()
             self.can.close()
@@ -202,8 +203,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.can.canid = 1
     
     def update_position(self):
-        print('updating position')
-        print(self.positionSlider.value())
+        # print('updating position')
+        # print(self.positionSlider.value())
         self.can.position = self.positionSlider.value()/1000 # resolution is np.pi*2/1000 (0.001 rad)
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
@@ -226,7 +227,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(5)
+        self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot)
 
     def update_plot(self):
