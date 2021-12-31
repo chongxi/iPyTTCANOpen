@@ -171,6 +171,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                     if self.can.enterMotorMode():
                         self.enable_update()
+                        self.target_position = 0
                         self.can.set(position=0, velocity=0, torque=0, kp=50, kd=1)
                         self.statusBar().showMessage('connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
                         self.timer.start()
@@ -205,11 +206,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_position(self):
         # print('updating position')
         # print(self.positionSlider.value())
-        self.can.position = self.positionSlider.value()/1000 # resolution is np.pi*2/1000 (0.001 rad)
+        # resolution is np.pi*2/1000 (0.001 rad)
+        self.target_position = self.positionSlider.value()/1000
+        self.can.position = self.target_position
         self.statusBar().showMessage(
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
 
-    def setup_plot(self, n_data=400):
+    def setup_plot(self, n_data=500):
+        self.dt = 10 # ms plot rate
         self.graphWidget_position = pg.PlotWidget()
         self.graphWidget_velocity = pg.PlotWidget()
         self.graphWidget_torque   = pg.PlotWidget()
@@ -217,26 +221,41 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout.addWidget(self.graphWidget_velocity)
         self.verticalLayout.addWidget(self.graphWidget_torque)
 
+        self.targetposdata = [0 for i in range(n_data)]
         self.posdata = [0 for i in range(n_data)]
         self.veldata = [0 for i in range(n_data)]
         self.tordata = [0 for i in range(n_data)]
 
+        self.curve_target_pos = self.graphWidget_position.plot()
         self.curve_pos = self.graphWidget_position.plot()
         self.curve_vel = self.graphWidget_velocity.plot()
         self.curve_tor = self.graphWidget_torque.plot()
 
+        ax0 = self.graphWidget_position.getAxis('bottom')
+        ax0.setTicks([[(i, str(i*self.dt*1e-3)) 
+                       for i in range(0, n_data, 100)]])
+
+        ax1 = self.graphWidget_velocity.getAxis('bottom')
+        ax1.setTicks([[(i, str(i*self.dt*1e-3))
+                       for i in range(0, n_data, 100)]])
+
+        ax2 = self.graphWidget_torque.getAxis('bottom')
+        ax2.setTicks([[(i, str(i*self.dt*1e-3))
+                       for i in range(0, n_data, 100)]])
+
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
+        self.timer.setInterval(self.dt)
         self.timer.timeout.connect(self.update_plot)
 
     def update_plot(self):
         self.can.refresh()
-        # Drop off the first y element, append a new one.
+        self.targetposdata = self.targetposdata[1:] + [self.target_position]
         self.posdata = self.posdata[1:] + [self.can._read_position_rad]
         self.veldata = self.veldata[1:] + [self.can._read_speed_rad]
         self.tordata = self.tordata[1:] + [self.can._read_torque]
-        self.curve_pos.setData(self.posdata)
+        self.curve_target_pos.setData(self.targetposdata, symbolSize=4, symbolBrush=('b'))
+        self.curve_pos.setData(self.posdata, symbolSize=4, symbolBrush=('r'))
         self.curve_vel.setData(self.veldata)
         self.curve_tor.setData(self.tordata)
 
