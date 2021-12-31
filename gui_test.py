@@ -264,7 +264,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.graphWidget_velocity.setYRange(-50, 50, padding=0)
         self.graphWidget_torque.setYRange(-20, 20, padding=0)
 
-        # This align the x position of three y-axes, by setting margin between ylabel and y-axis itself
+        # This align the x position of three y-axes, by setting the width of the axis reserved for ticks and tick labels
         self.graphWidget_position.getAxis('left').setWidth(80)
         self.graphWidget_velocity.getAxis('left').setWidth(80)
         self.graphWidget_torque.getAxis('left').setWidth(80)
