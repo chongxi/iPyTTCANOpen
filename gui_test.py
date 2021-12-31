@@ -115,6 +115,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self)
 
+        self.disable_update() # disable all the update functions until the serial is connected
+
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "Single Motor FOC Test"))
@@ -136,6 +138,28 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.serialConnectBtn.clicked.connect(self.connect_to_motor)
         self.positionSlider.valueChanged.connect(self.update_position)
         self.lineEdit_can.returnPressed.connect(self.update_can_id)
+
+    def disable_update(self):
+        self.serialConnectBtn.setText('Connect')
+        self.serialConnectBtn.setChecked(False)
+        self.serialConnectBtn.setStyleSheet(
+            'background-color: white')
+        self.positionSlider.setEnabled(False)
+        self.lineEdit.setEnabled(False)
+        self.lineEdit_2.setEnabled(False)
+        self.lineEdit_3.setEnabled(False)
+        self.serialSelector.setEnabled(True)
+
+    def enable_update(self):
+        self.serialConnectBtn.setText('Disconnect')
+        self.serialConnectBtn.setChecked(True)
+        self.serialConnectBtn.setStyleSheet(
+            'background-color: green')
+        self.positionSlider.setEnabled(True)
+        self.lineEdit.setEnabled(True)
+        self.lineEdit_2.setEnabled(True)
+        self.lineEdit_3.setEnabled(True)
+        self.serialSelector.setEnabled(False)
     
     def connect_to_motor(self, checked):
         if checked:
@@ -146,15 +170,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 if self.can.is_connected:
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                     if self.can.enterMotorMode():
-                        self.serialConnectBtn.setText('Disconnect')
-                        self.serialConnectBtn.setChecked(True)
-                        self.serialConnectBtn.setStyleSheet(
-                            'background-color: green')
-                        self.positionSlider.setEnabled(True)
-                        self.lineEdit.setEnabled(True)
-                        self.lineEdit_2.setEnabled(True)
-                        self.lineEdit_3.setEnabled(True)
-                        self.serialSelector.setEnabled(False)
+                        self.enable_update()
                         self.statusBar().showMessage('connected to {}, CANID={}'.format(self.serialPort, self.canid))
                     else:
                         self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
@@ -167,15 +183,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         elif checked==0:
             if self.can.exitMotorMode():
-                self.serialConnectBtn.setText('Connect')
-                self.serialConnectBtn.setChecked(False)
-                self.serialConnectBtn.setStyleSheet(
-                    'background-color: white')
-                self.positionSlider.setEnabled(False)
-                self.lineEdit.setEnabled(False)
-                self.lineEdit_2.setEnabled(False)
-                self.lineEdit_3.setEnabled(False)
-                self.serialSelector.setEnabled(True)
+                self.disable_update()
             self.can.exitMotorMode()
             self.can.close()
     
