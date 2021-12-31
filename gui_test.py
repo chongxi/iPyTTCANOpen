@@ -123,21 +123,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_8.setText(_translate("MainWindow", "torque"))
         self.label_can.setText(_translate("MainWindow", "CAN_ID:"))
         self.label_position.setText(_translate("MainWindow", "Position"))
-        self.label_7.setText(_translate("MainWindow", "velosity"))
+        self.label_7.setText(_translate("MainWindow", "velocity"))
         self.label_kpkd.setText(_translate("MainWindow", "Kp,Kd:"))
         self.label_serial.setText(_translate("MainWindow", "Serial port"))
+
+        self.lineEdit_can.setText('1')
+        self.lineEdit.setText('50,1')
+        self.lineEdit_2.setText('0')
+        self.lineEdit_3.setText('0')
 
     def setup_callback(self):
         self.serialConnectBtn.clicked.connect(self.connect_to_motor)
         self.positionSlider.valueChanged.connect(self.update_position)
-        self.lineEdit_can.editingFinished.connect(self.update_can_id)
+        self.lineEdit_can.returnPressed.connect(self.update_can_id)
     
     def connect_to_motor(self, checked):
         if checked:
             try:
                 self.serialPort = self.serialSelector.currentText()
                 print('connecting to motor {}'.format(self.serialPort))
-                self.can = serialCAN(port=self.serialPort, canid=1)
+                self.can = serialCAN(port=self.serialPort, canid=self.canid)
                 if self.can.is_connected:
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                     if self.can.enterMotorMode():
@@ -168,6 +173,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.serialSelector.setEnabled(True)
             self.can.exitMotorMode()
             self.can.close()
+    
+    @property
+    def canid(self):
+        return int(self.lineEdit_can.text())
 
     def update_can_id(self):
         try:
