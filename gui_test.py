@@ -171,7 +171,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                     if self.can.enterMotorMode():
                         self.enable_update()
-                        self.statusBar().showMessage('connected to {}, CANID={}'.format(self.serialPort, self.canid))
+                        self.can.set(position=0, velocity=0, torque=0, kp=50, kd=1)
+                        self.statusBar().showMessage('connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
                     else:
                         self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
                         self.serialConnectBtn.toggle()
@@ -202,6 +203,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_position(self):
         print('updating position')
         print(self.positionSlider.value())
+        self.can.position = self.positionSlider.value()/1000
 
     def setup_plot(self, n_data=400):
         self.graphWidget_position = pg.PlotWidget()
