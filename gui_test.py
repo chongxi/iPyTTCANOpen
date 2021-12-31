@@ -230,6 +230,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.graphWidget_velocity = graph_layout.addPlot(1, 0)
         self.graphWidget_torque = graph_layout.addPlot(2, 0)
 
+        # add legend
+        self.graphWidget_position.addLegend()
+
         # Initialize thd data to plot before data acquisition, all be zeros
         self.targetposdata = [0 for i in range(n_data)]
         self.posdata = [0 for i in range(n_data)]
@@ -237,8 +240,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.tordata = [0 for i in range(n_data)]
 
         # Acquire the curve to update in real time
-        self.curve_target_pos = self.graphWidget_position.plot()
-        self.curve_pos = self.graphWidget_position.plot()
+        self.curve_target_pos = self.graphWidget_position.plot(name='target position', pen='b')
+        self.curve_pos = self.graphWidget_position.plot(name='actual position', pen='r')
         self.curve_vel = self.graphWidget_velocity.plot()
         self.curve_tor = self.graphWidget_torque.plot()
 
@@ -286,8 +289,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.posdata = self.posdata[1:] + [self.can._read_position_rad]
         self.veldata = self.veldata[1:] + [self.can._read_speed_rad]
         self.tordata = self.tordata[1:] + [self.can._read_torque]
-        self.curve_target_pos.setData(self.targetposdata, symbolSize=4, symbolBrush=('b'))
-        self.curve_pos.setData(self.posdata, symbolSize=4, symbolBrush=('r'))
+        self.curve_target_pos.setData(self.targetposdata, pen='b', symbolSize=4, symbolBrush=('b'))
+        self.curve_pos.setData(self.posdata, pen='r', symbolSize=4, symbolBrush=('r'))
         self.curve_vel.setData(self.veldata)
         self.curve_tor.setData(self.tordata)
 
