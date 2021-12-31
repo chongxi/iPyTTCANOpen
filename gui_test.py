@@ -167,7 +167,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.serialPort = self.serialSelector.currentText()
                 print('connecting to motor {}'.format(self.serialPort))
                 self.can = serialCAN(port=self.serialPort, canid=self.canid)
-                if self.can.is_connected:
+                if self.can.is_connected:  # meaning the handshake with the motor was successful
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                     if self.can.enterMotorMode():
                         self.enable_update()
