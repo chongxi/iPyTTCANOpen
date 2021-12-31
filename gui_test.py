@@ -214,23 +214,35 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setup_plot(self, n_data=500):
         self.dt = 10 # ms plot rate
-        self.graphWidget_position = pg.PlotWidget()
-        self.graphWidget_velocity = pg.PlotWidget()
-        self.graphWidget_torque   = pg.PlotWidget()
-        self.verticalLayout.addWidget(self.graphWidget_position)
-        self.verticalLayout.addWidget(self.graphWidget_velocity)
-        self.verticalLayout.addWidget(self.graphWidget_torque)
 
+        # define a pyqtgraph GraphicsView that can be embedded in a Qt application
+        graph_view = pg.GraphicsView()
+        self.verticalLayout.addWidget(graph_view)
+
+        # define a graph_layout which hosts all the plots
+        graph_layout = pg.GraphicsLayout()
+        graph_view.setCentralItem(graph_layout)
+        graph_layout.setSpacing(0.)
+        graph_layout.setContentsMargins(-10., -10., -10., -10.)
+
+        # Add three subplots: position, velocity, and torque
+        self.graphWidget_position = graph_layout.addPlot(0, 0)
+        self.graphWidget_velocity = graph_layout.addPlot(1, 0)
+        self.graphWidget_torque = graph_layout.addPlot(2, 0)
+
+        # Initialize thd data to plot before data acquisition, all be zeros
         self.targetposdata = [0 for i in range(n_data)]
         self.posdata = [0 for i in range(n_data)]
         self.veldata = [0 for i in range(n_data)]
         self.tordata = [0 for i in range(n_data)]
 
+        # Acquire the curve to update in real time
         self.curve_target_pos = self.graphWidget_position.plot()
         self.curve_pos = self.graphWidget_position.plot()
         self.curve_vel = self.graphWidget_velocity.plot()
         self.curve_tor = self.graphWidget_torque.plot()
 
+        # set the x axis to show the xlabel ticks as time units
         ax0 = self.graphWidget_position.getAxis('bottom')
         ax0.setTicks([[(i, str(i*self.dt*1e-3)) 
                        for i in range(0, n_data, 100)]])
@@ -242,18 +254,26 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ax2 = self.graphWidget_torque.getAxis('bottom')
         ax2.setTicks([[(i, str(i*self.dt*1e-3))
                        for i in range(0, n_data, 100)]])
+
+        # This links three x-axis together
         self.graphWidget_velocity.setXLink(self.graphWidget_position)
         self.graphWidget_torque.setXLink(self.graphWidget_position)
 
+        # set YRange of each y-axis
         self.graphWidget_position.setYRange(0, 6.29, padding=0)
         self.graphWidget_velocity.setYRange(-50, 50, padding=0)
         self.graphWidget_torque.setYRange(-20, 20, padding=0)
-        
-        self.graphWidget_position.setLabel('left', 'position', units='rad')
-        self.graphWidget_velocity.setLabel('left', 'velocity', units='rad/s')
-        self.graphWidget_torque.setLabel('left', 'torque', units='Nm')
-        self.graphWidget_torque.setLabel('bottom', 'time', units='s')
 
+        # This align the x position of three y-axes, by setting margin between ylabel and y-axis itself
+        self.graphWidget_position.getAxis('left').setWidth(80)
+        self.graphWidget_velocity.getAxis('left').setWidth(80)
+        self.graphWidget_torque.getAxis('left').setWidth(80)
+
+        # set ylabel of each y-axis
+        self.graphWidget_position.setLabel('left', 'Position', units='Rad')
+        self.graphWidget_velocity.setLabel('left', 'Velocity', units='Rad/s')
+        self.graphWidget_torque.setLabel('left', 'Torque', units='Nm')
+        self.graphWidget_torque.setLabel('bottom', 'Time', units='s')
 
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()
