@@ -203,7 +203,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_position(self):
         print('updating position')
         print(self.positionSlider.value())
-        self.can.position = self.positionSlider.value()/1000
+        self.can.position = self.positionSlider.value()/1000 # resolution is np.pi*2/1000 (0.001 rad)
 
     def setup_plot(self, n_data=400):
         self.graphWidget_position = pg.PlotWidget()
