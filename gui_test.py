@@ -155,10 +155,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                         self.lineEdit_2.setEnabled(True)
                         self.lineEdit_3.setEnabled(True)
                         self.serialSelector.setEnabled(False)
+                        self.statusBar().showMessage('connected to {}, CANID={}'.format(self.serialPort, self.canid))
+                    else:
+                        self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
+                        self.serialConnectBtn.toggle()
             except:
                 print('could not connect to motor')
                 self.statusBar().showMessage('cannot connect to {}'.format(self.serialPort))
-                self.serialConnectBtn.setChecked(False)
+                self.serialConnectBtn.toggle()
 
         elif checked==0:
             if self.can.exitMotorMode():
