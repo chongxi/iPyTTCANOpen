@@ -52,10 +52,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.serialConnectBtn.setCheckable(True)
         self.gridLayout.addWidget(self.serialConnectBtn, 0, 2, 1, 1)
 
-        # self.enterMoterBtn = QtWidgets.QPushButton(self.groupBox)
-        # self.enterMoterBtn.setObjectName("enterMotorBtn")
-        # self.enterMoterBtn.setCheckable(True)
-        # self.gridLayout.addWidget(self.enterMoterBtn, 0, 3, 1, 1)
+        self.Btnlayout = QtWidgets.QHBoxLayout()
+        self.zeroPositionBtn = QtWidgets.QPushButton(self.groupBox)
+        self.zeroPositionBtn.setObjectName("zeroPositionBtn")
+        self.motorModeBtn = QtWidgets.QPushButton(self.groupBox)
+        self.motorModeBtn.setCheckable(True)
+        self.motorModeBtn.setObjectName("motorModeBtn")
+        self.gridLayout.addLayout(self.Btnlayout, 0, 3, 1, 1)
+        self.Btnlayout.addWidget(self.zeroPositionBtn, 0, Qt.AlignLeft)
+        self.Btnlayout.addWidget(self.motorModeBtn, 1, Qt.AlignLeft)
 
         self.label_can = QtWidgets.QLabel(self.groupBox)
         self.label_can.setObjectName("label_can")
@@ -127,6 +132,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle(_translate("MainWindow", "Single Motor FOC Test"))
         self.groupBox.setTitle(_translate("MainWindow", "Configuration:"))
         self.serialConnectBtn.setText(_translate("MainWindow", "Connect"))
+        self.zeroPositionBtn.setText(_translate("MainWindow", "Zero Position"))
+        self.motorModeBtn.setText(_translate("MainWindow", "Motor Mode"))
         self.label_8.setText(_translate("MainWindow", "torque"))
         self.label_can.setText(_translate("MainWindow", "CAN_ID:"))
         self.label_position.setText(_translate("MainWindow", "Position"))
@@ -142,6 +149,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setup_callback(self):
         self.serialConnectBtn.clicked.connect(self.connect_to_motor)
+        self.zeroPositionBtn.clicked.connect(self.zero_position)
+        self.motorModeBtn.clicked.connect(self.enter_motor_mode)
         self.positionSlider.valueChanged.connect(self.update_position_slider)
         self.positionEdit.returnPressed.connect(self.update_position_edit)
         self.lineEdit_can.returnPressed.connect(self.update_can_id)
@@ -152,6 +161,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.serialConnectBtn.setStyleSheet(
             'background-color: white')
         self.positionSlider.setEnabled(False)
+        self.positionEdit.setEnabled(False)
+        self.motorModeBtn.setEnabled(False)
+        self.zeroPositionBtn.setEnabled(False)
         self.lineEdit.setEnabled(False)
         self.lineEdit_2.setEnabled(False)
         self.lineEdit_3.setEnabled(False)
@@ -162,7 +174,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.serialConnectBtn.setChecked(True)
         self.serialConnectBtn.setStyleSheet(
             'background-color: green')
+        self.motorModeBtn.setEnabled(True)
+        self.zeroPositionBtn.setEnabled(True)
         self.positionSlider.setEnabled(True)
+        self.positionEdit.setEnabled(True)
         self.lineEdit.setEnabled(True)
         self.lineEdit_2.setEnabled(True)
         self.lineEdit_3.setEnabled(True)
@@ -175,17 +190,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 print('connecting to motor {}'.format(self.serialPort))
                 self.can = serialCAN(port=self.serialPort, canid=self.canid)
                 if self.can.is_connected:  # meaning the handshake with the motor was successful
+                    self.enable_update()
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
-                    if self.can.enterMotorMode():
-                        self.enable_update()
-                        self.target_position = 0
-                        self.can.set(position=0, velocity=0, torque=0, kp=50, kd=1)
-                        self.statusBar().showMessage('connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
-                        self.timer.start()
-                    else:
-                        self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
-                        self.serialConnectBtn.toggle()
-                        self.can.close()
+                else:
+                    self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
+                    self.serialConnectBtn.toggle()
+                    self.can.close()
             except:
                 print('could not connect to motor')
                 self.statusBar().showMessage('cannot connect to {}'.format(self.serialPort))
@@ -197,6 +207,29 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 self.disable_update()
             self.can.exitMotorMode()
             self.can.close()
+    
+    def zero_position(self):
+        self.can.setZeroPosition()
+
+    def enter_motor_mode(self, checked):
+        if checked:
+            if self.can.enterMotorMode():
+                self.target_position = 0
+                self.can.set(position=0, velocity=0,
+                                torque=0, kp=50, kd=1)
+                self.statusBar().showMessage(
+                    'connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
+                self.motorModeBtn.setStyleSheet(
+                    'background-color: green')
+                self.timer.start()
+            else:
+                self.motorModeBtn.setStyleSheet(
+                    'background-color: red')
+                print('enter motor mode failed')
+        else:
+            self.can.exitMotorMode()
+            self.motorModeBtn.setStyleSheet(
+                    'background-color: white')
     
     @property
     def canid(self):
