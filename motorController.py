@@ -4,7 +4,7 @@ from utils import *
 import time
 
 
-class serialCAN():
+class motorController():
     """
     Use TTCANOpen protocol to communicate with the MIT cheetah actuator CAN bus (via serial port), using pyserial here
     baudrate: 256000 (256000 serial baudrate ~ 1000kbps CAN baudrate)

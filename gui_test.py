@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 import sys
 import numpy as np
 import pyqtgraph as pg
-from serialCAN import serialCAN
+from motorController import motorController
 
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -32,9 +32,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit.setObjectName("lineEdit")
-        self.gridLayout.addWidget(self.lineEdit, 2, 1, 1, 1)
+        self.lineEdit_Kpd = QtWidgets.QLineEdit(self.groupBox)
+        self.lineEdit_Kpd.setObjectName("lineEdit_Kpd")
+        self.gridLayout.addWidget(self.lineEdit_Kpd, 2, 1, 1, 1)
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.gridLayout.addWidget(self.lineEdit_2, 2, 3, 1, 1)
@@ -141,7 +141,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_serial.setText(_translate("MainWindow", "Serial port"))
 
         self.lineEdit_can.setText('1')
-        self.lineEdit.setText('50,1')
+        self.lineEdit_Kpd.setText('50,1')
         self.lineEdit_2.setText('0')
         self.lineEdit_3.setText('0')
         self.positionEdit.setText('0')
@@ -153,6 +153,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.positionSlider.valueChanged.connect(self.update_position_slider)
         self.positionEdit.returnPressed.connect(self.update_position_edit)
         self.lineEdit_can.returnPressed.connect(self.update_can_id)
+        self.lineEdit_Kpd.returnPressed.connect(self.update_kpkd)
 
     def disable_update(self):
         self.serialConnectBtn.setText('Connect')
@@ -163,7 +164,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.positionEdit.setEnabled(False)
         self.motorModeBtn.setEnabled(False)
         self.zeroPositionBtn.setEnabled(False)
-        self.lineEdit.setEnabled(False)
+        self.lineEdit_Kpd.setEnabled(False)
         self.lineEdit_2.setEnabled(False)
         self.lineEdit_3.setEnabled(False)
         self.serialSelector.setEnabled(True)
@@ -177,7 +178,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.zeroPositionBtn.setEnabled(True)
         self.positionSlider.setEnabled(True)
         self.positionEdit.setEnabled(True)
-        self.lineEdit.setEnabled(True)
+        self.lineEdit_Kpd.setEnabled(True)
         self.lineEdit_2.setEnabled(True)
         self.lineEdit_3.setEnabled(True)
         self.serialSelector.setEnabled(False)
@@ -187,34 +188,34 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             try:
                 self.serialPort = self.serialSelector.currentText()
                 print('connecting to motor {}'.format(self.serialPort))
-                self.can = serialCAN(port=self.serialPort, canid=self.canid)
-                if self.can.is_connected:  # meaning the handshake with the motor was successful
+                self.motor = motorController(port=self.serialPort, canid=self.canid)
+                if self.motor.is_connected:  # meaning the handshake with the motor was successful
                     self.enable_update()
                     self.statusBar().showMessage('connect to {}'.format(self.serialPort))
                 else:
                     self.statusBar().showMessage('enter motor mode failed, check the CAN_ID')
                     self.serialConnectBtn.toggle()
-                    self.can.close()
+                    self.motor.close()
             except:
                 print('could not connect to motor')
                 self.statusBar().showMessage('cannot connect to {}'.format(self.serialPort))
                 self.serialConnectBtn.toggle()
 
         elif checked==0:
-            if self.can.exitMotorMode():
+            if self.motor.exitMotorMode():
                 self.timer.stop()
                 self.disable_update()
-            self.can.exitMotorMode()
-            self.can.close()
+            self.motor.exitMotorMode()
+            self.motor.close()
     
     def zero_position(self):
-        self.can.setZeroPosition()
+        self.motor.setZeroPosition()
 
     def enter_motor_mode(self, checked):
         if checked:
-            if self.can.enterMotorMode():
+            if self.motor.enterMotorMode():
                 self.target_position = 0
-                self.can.set(position=0, velocity=0,
+                self.motor.set(position=0, velocity=0,
                                 torque=0, kp=50, kd=1)
                 self.statusBar().showMessage(
                     'connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
@@ -226,7 +227,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                     'background-color: red')
                 print('enter motor mode failed')
         else:
-            self.can.exitMotorMode()
+            self.motor.exitMotorMode()
             self.motorModeBtn.setStyleSheet(
                     'background-color: white')
     
@@ -236,25 +237,34 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def update_can_id(self):
         try:
-            self.can.canid = int(self.lineEdit_can.text())
-            print('can id set to {}'.format(self.can.canid))
+            self.motor.canid = int(self.lineEdit_can.text())
+            print('can id set to {}'.format(self.motor.canid))
         except:
             print('fail to change CAN ID at {}'.format(self.serialPort))
-            self.can.canid = 1
+            self.motor.canid = 1
+
+    def update_kpkd(self):
+        try:
+            kp, kd = map(float, self.lineEdit_Kpd.text().split(','))
+            print('kp={}, kd={}'.format(kp, kd))
+            self.motor.set(position=self.motor._position, velocity=self.motor._velocity,
+                         torque=self.motor._torque, kp=kp, kd=kd)
+        except:
+            print('fail to change Kp,Kd at {}'.format(self.serialPort))
     
     def update_position_slider(self):
         self.target_position = self.positionSlider.value()/1000
-        self.can.position = self.target_position
+        self.motor.position = self.target_position
         self.positionEdit.setText(str(self.target_position))
         self.statusBar().showMessage(
-            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
+            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.motor.position))
 
     def update_position_edit(self):
         self.target_position = float(self.positionEdit.text())
-        self.can.position = self.target_position
+        self.motor.position = self.target_position
         self.positionSlider.setValue(int(self.target_position*1000))
         self.statusBar().showMessage(
-            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.can.position))
+            'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.motor.position))
 
     def setup_plot(self, n_data=500):
         self.dt = 10 # ms plot rate
@@ -307,9 +317,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.graphWidget_torque.setXLink(self.graphWidget_position)
 
         # set YRange of each y-axis
-        self.graphWidget_position.setYRange(0, 6.29, padding=0)
+        self.graphWidget_position.setYRange(-3, 9, padding=0)
         self.graphWidget_velocity.setYRange(-50, 50, padding=0)
-        self.graphWidget_torque.setYRange(-20, 20, padding=0)
+        self.graphWidget_torque.setYRange(-5, 5, padding=0)
 
         # This align the x position of three y-axes, by setting the width of the axis reserved for ticks and tick labels
         self.graphWidget_position.getAxis('left').setWidth(80)
@@ -328,11 +338,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.update_plot)
 
     def update_plot(self):
-        self.can.refresh()
+        self.motor.refresh()
         self.targetposdata = self.targetposdata[1:] + [self.target_position]
-        self.posdata = self.posdata[1:] + [self.can._read_position_rad]
-        self.veldata = self.veldata[1:] + [self.can._read_speed_rad]
-        self.tordata = self.tordata[1:] + [self.can._read_torque]
+        self.posdata = self.posdata[1:] + [self.motor._read_position_rad]
+        self.veldata = self.veldata[1:] + [self.motor._read_speed_rad]
+        self.tordata = self.tordata[1:] + [self.motor._read_torque]
         self.curve_target_pos.setData(self.targetposdata, pen='b', symbolSize=4, symbolBrush=('b'))
         self.curve_pos.setData(self.posdata, pen='r', symbolSize=4, symbolBrush=('r'))
         self.curve_vel.setData(self.veldata)
