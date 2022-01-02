@@ -1,5 +1,5 @@
 from bitstring import main
-from serialCAN import serialCAN
+from motorController import serialCAN
 import numpy as np
 import time
 
