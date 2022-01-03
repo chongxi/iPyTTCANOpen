@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 # Working parameters for AK80-6 V1.0 firmware
-PARAMS = {
+PARAMS_V1 = {
     "P_MIN": -95.5,
     "P_MAX": 95.5,
     "V_MIN": -45.0,
@@ -15,7 +15,6 @@ PARAMS = {
     "T_MAX": 18.0,
     "AXIS_DIRECTION": -1
 }
-
 
 # 16-Bits for Raw Position Values
 maxRawPosition = 2**16 - 1

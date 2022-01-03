@@ -1,6 +1,7 @@
 import serial
 from bitstring import BitArray
 from utils import *
+from utils import PARAMS_V1 as PARAMS
 import time
 
 
