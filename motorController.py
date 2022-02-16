@@ -7,10 +7,11 @@ import time
 
 class motorController():
     """
-    Use TTCANOpen protocol to communicate with the MIT cheetah actuator CAN bus (via serial port), using pyserial here
+    Use TTCANOpen protocol to communicate with the MIT cheetah actuator CAN bus (via serial port), using pyserial here.
+    Default parameters:
     baudrate: 256000 (256000 serial baudrate ~ 1000kbps CAN baudrate)
     parity: 'O' (odd)
-    timeout: 0 (non-blocking)
+    timeout: 0.05 (0 for non-blocking mode)
 
     Usage:
     >>> from motorController import motorController
