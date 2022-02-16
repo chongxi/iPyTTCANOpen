@@ -39,7 +39,7 @@ class motorController():
         self.ser.baudrate = self.baudrate
         waitOhneSleep(0.5)
         acq = self.ser.readlines()
-        if acq[-2] == b'AA CC 18765432 08 11 22 33 44 55 66 77 88 DD\r\n':
+        if acq[-2] == b'AA CC 18765432 08 11 22 33 44 55 66 77 88 DD\r\n':  # specific to current TTCANOpen protocol
             self.is_connected = True
         else:
             self.is_connected = False
