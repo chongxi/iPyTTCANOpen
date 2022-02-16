@@ -11,6 +11,15 @@ class motorController():
     baudrate: 256000 (256000 serial baudrate ~ 1000kbps CAN baudrate)
     parity: 'O' (odd)
     timeout: 0 (non-blocking)
+
+    Usage:
+    >>> from motorController import motorController
+    >>> mc = motorController('/dev/ttyUSB0', canid=1) # or mc = motorController('COM10', canid=1)
+    >>> mc.enterMotorMode() # here you should hear the sound of current flowing through the motor
+    >>> mc.set(0, 0, 0, 5, 0.2) # set position to 0, velocity to 0, torque to 0, kp to 5, kd to 0.2
+    >>> mc.refresh() # set the same command again and read out the status
+    >>> mc.exitMotorMode()
+    >>> mc.close()
     """
     def __init__(self, port, canid=1, baudrate=256000, parity='O', timeout=0.05):
         self.port = port
@@ -52,7 +61,9 @@ class motorController():
         self.cmd = BitArray(cmd)
         self.cmd.hex = self.prefix.hex + self.cmd.hex # order is important here; don;t use +=
         self.send(self.cmd.bytes)
+        print(self.cmd.hex)
         ack = self.ser.read(16)
+        print(BitArray(ack).hex)
         if len(ack)>0:
             return True
 
