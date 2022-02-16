@@ -72,7 +72,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.addWidget(self.lineEdit_can, 0, 5, 1, 1)
 
         self.positionSlider = QtWidgets.QSlider(self.groupBox)
-        self.positionSlider.setMaximum(6290)
+        self.positionSlider.setMaximum(62900)
         self.positionSlider.setPageStep(10)
         self.positionSlider.setOrientation(QtCore.Qt.Horizontal)
         self.positionSlider.setObjectName("positionSlider")
@@ -141,7 +141,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_serial.setText(_translate("MainWindow", "Serial port"))
 
         self.lineEdit_can.setText('1')
-        self.lineEdit_Kpd.setText('50,1')
+        self.lineEdit_Kpd.setText('0.5,0.1')
         self.lineEdit_2.setText('0')
         self.lineEdit_3.setText('0')
         self.positionEdit.setText('0')
@@ -216,7 +216,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             if self.motor.enterMotorMode():
                 self.target_position = 0
                 self.motor.set(position=0, velocity=0,
-                                torque=0, kp=50, kd=1)
+                                torque=0, kp=0.5, kd=0.1)
                 self.statusBar().showMessage(
                     'connected to {}, CANID={}, position={}'.format(self.serialPort, self.canid, 0))
                 self.motorModeBtn.setStyleSheet(
@@ -267,7 +267,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'connected to {}, CANID={}, position={} rad'.format(self.serialPort, self.canid, self.motor.position))
 
     def setup_plot(self, n_data=500):
-        self.dt = 10 # ms plot rate
+        self.dt = 5 # ms plot rate
 
         # define a pyqtgraph GraphicsView that can be embedded in a Qt application
         graph_view = pg.GraphicsView()

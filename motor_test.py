@@ -1,4 +1,4 @@
-from bitstring import main
+# from bitstring import main
 from motorController import motorController
 import numpy as np
 import time
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     motor1.enterMotorMode()
     motor1.set(position=0, velocity=0, torque=0, kp=8, kd=0.5)
     time.sleep(2)
-    for theta in np.arange(0.01, 2*np.pi/4, np.pi/360/10):
+    for theta in np.arange(0.01, 2*np.pi*4, np.pi/360):
         target_pos = theta  # np.pi/k*i
         print('target', target_pos)
         for j in range(1):
