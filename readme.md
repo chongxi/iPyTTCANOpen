@@ -47,8 +47,12 @@ enter motor mode command for example:
     | CAN ID high (0x00) |
     | CAN ID low (0x01) |
     | data length (0x08) |
-    | data (0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC) |
+    | **data (0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC)** |
     | end (0xDD) |
+
+TTCANOPEN protocol wrap CAN DATA with header and stop
+
+`0xAA, 0x55, 0x00, 0x01, 0x08, 8BYTES_DATA, 0xDD`
 
 Note: 
 - The CAN ID is 11-bit ID. In the PC it takes two bytes, so the ID 01 is `0x0001`. The USB2CAN hardware will send the CAN packet with 11-bit ID since the frame type `0x55` indicates standard frame. 
